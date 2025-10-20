@@ -8,7 +8,7 @@ module datapath (
         input  wire        alu_src,
         input  wire        dm2reg,
         input  wire        enable_write_return_addr,
-        input  wire        register_jump_addr,
+        input  wire        enable_register_jump,
         input  wire [3:0]  alu_ctrl,
         input  wire [4:0]  ra3,
         input  wire [31:0] instr,
@@ -58,29 +58,23 @@ module datapath (
             .y              (bta)
         );
 
-    mux2 #(32) pc_src_mux (
+
+    mux2 #(32) pc_branch_result_mux (
             .sel            (pc_src),
             .a              (pc_plus4),
             .b              (bta),
             .y              (pc_pre)
         );
         
-    mux2 #(32) pc_jmp_register_jump_mux (
-            .sel (register_jump_addr),
-            .a (jta_from_instruction),
-            .b (alu_pa),
-            .y (jta)
-    )
-
-    mux2 #(32) pc_jmp_mux (
-            .sel            (jump),
-            .a              (pc_pre),
-            .b              (jta),
-            .y              (pc_next)
-        );
+    mux4 #(32) pc_src_mux (
+        .sel    ({enable_register_jump, jump}),
+        .a      (pc_pre),
+        .b      (jta_from_instruction),
+        .c      (alu_pa),
+        .d      (32'hXXXX_XXXX),
+        .y      (pc_next)
+    );
     
-
-
     wire [4:0] rf_wa_intermediate;
     // --- RF Logic --- //
     mux2 #(5) rf_wa_intermediate_mux (
@@ -90,12 +84,15 @@ module datapath (
             .y              (rf_wa_intermediate)
         );
 
-    mux2 #(5) rf_wa_return_address_mus (
+    wire [4:0] RETURN_ADDRESS_REGISTER;
+    assign RETURN_ADDRESS_REGISTER = 5'b11111;
+
+    mux2 #(5) rf_wa_return_address_mux (
         .sel                (enable_write_return_addr),
         .a                  (rf_wa_intermediate),
-        .b                  (5'b11111),
-        .y                  (rf_wa),
-    )
+        .b                  (RETURN_ADDRESS_REGISTER),
+        .y                  (rf_wa)
+    );
 
 
     regfile rf (
@@ -128,7 +125,7 @@ module datapath (
             .op             (alu_ctrl),
             .a              (alu_pa),
             .b              (alu_pb),
-            .shmt           (instr[10:6])
+            .shmt           (instr[10:6]),
             .zero           (zero),
             .y              (alu_out)
         );
@@ -146,7 +143,7 @@ module datapath (
     mux2 #(32) rf_wd_pc_return_address_mux (
             .sel            (enable_write_return_addr),
             .a              (wd_rf_intermediate),
-            .b              (pc_current),
+            .b              (pc_plus4),
             .y              (wd_rf)
         );
 

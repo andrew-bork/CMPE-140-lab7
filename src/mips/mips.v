@@ -17,7 +17,10 @@ module mips (
     wire       we_reg;
     wire       alu_src;
     wire       dm2reg;
-    wire [2:0] alu_ctrl;
+    wire [3:0] alu_ctrl;
+
+    wire enable_write_return_addr;
+    wire enable_register_jump;
 
     datapath dp (
             .clk            (clk),
@@ -35,7 +38,10 @@ module mips (
             .pc_current     (pc_current),
             .alu_out        (alu_out),
             .wd_dm          (wd_dm),
-            .rd3            (rd3)
+            .rd3            (rd3),
+
+            .enable_write_return_addr (enable_write_return_addr),
+            .enable_register_jump (enable_register_jump)
         );
 
     controlunit cu (
@@ -48,7 +54,10 @@ module mips (
             .alu_src        (alu_src),
             .we_dm          (we_dm),
             .dm2reg         (dm2reg),
-            .alu_ctrl       (alu_ctrl)
+            .alu_ctrl       (alu_ctrl),
+
+            .enable_write_return_addr (enable_write_return_addr),
+            .enable_register_jump (enable_register_jump)
         );
 
 endmodule

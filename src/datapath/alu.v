@@ -2,12 +2,12 @@ module alu (
         input  wire [3:0]  op,
         input  wire [31:0] a,
         input  wire [31:0] b,
-        input  wire [2:0]  shmt,
+        input  wire [4:0]  shmt,
         output wire        zero,
         output reg  [31:0] y
     );
 
-    reg [31:0] multiplier_register;
+    reg [63:0] multiplier_register;
 
     assign zero = (y == 0);
 
@@ -21,8 +21,12 @@ module alu (
             4'b1000: y = a << shmt;
             4'b1001: y = a >> shmt;
             4'b1100: multiplier_register = a * b;
-            4'b1010: y = multiplier_register[15:0];
-            4'b1011: y = multiplier_register[31:16];
+            4'b1010: y = multiplier_register[31:0];
+            4'b1011: y = multiplier_register[63:32];
+
+            4'b1111: y = a; // Pass through
+
+            default: y = 32'hXXXX_XXXX;
         endcase
     end
 

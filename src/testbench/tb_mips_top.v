@@ -39,8 +39,10 @@ module tb_mips_top;
     endtask
     
     initial begin
+        $dumpfile("mips.vcd");
+        $dumpvars(0, tb_mips_top);
         reset;
-        while(pc_current != 32'h48) tick;
+        while(pc_current != 32'h88) tick;
         $finish;
     end
 

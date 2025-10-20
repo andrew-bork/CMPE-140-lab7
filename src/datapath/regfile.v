@@ -28,4 +28,17 @@ module regfile (
     assign rd2 = (ra2 == 0) ? 0 : rf[ra2];
     assign rd3 = (ra3 == 0) ? 0 : rf[ra3];
 
+    
+    initial begin
+        $dumpfile("regs.vcd");
+        $dumpvars(0, rf[7]);
+        $dumpvars(0, rf[8]);
+        $dumpvars(0, rf[3]);
+        $dumpvars(0, rf[31]);
+        $dumpvars(0, rf[16]);
+        $dumpvars(0, rf[4]);
+        $dumpvars(0, rf[2]);
+        $dumpvars(0, rf[29]);
+    end
+
 endmodule
