@@ -127,7 +127,8 @@ module datapath (
             .b              (alu_pb),
             .shmt           (instr[10:6]),
             .zero           (zero),
-            .y              (alu_out)
+            .y              (alu_out),
+            .clk            (clk)
         );
 
 
