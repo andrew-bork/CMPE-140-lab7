@@ -7,6 +7,8 @@ module datapath (
         input  wire        we_reg,
         input  wire        alu_src,
         input  wire        dm2reg,
+        input  wire        enable_write_return_addr,
+        input  wire        register_jump_addr,
         input  wire [3:0]  alu_ctrl,
         input  wire [4:0]  ra3,
         input  wire [31:0] instr,
@@ -26,14 +28,15 @@ module datapath (
     wire [31:0] ba;
     wire [31:0] bta;
     wire [31:0] jta;
+    wire [31:0] jta_from_instruction;
     wire [31:0] alu_pa;
     wire [31:0] alu_pb;
     wire [31:0] wd_rf;
     wire        zero;
-    
+
     assign pc_src = branch & zero;
     assign ba = {sext_imm[29:0], 2'b00};
-    assign jta = {pc_plus4[31:28], instr[25:0], 2'b00};
+    assign jta_from_instruction = {pc_plus4[31:28], instr[25:0], 2'b00};
     
     // --- PC Logic --- //
     dreg pc_reg (
@@ -61,6 +64,13 @@ module datapath (
             .b              (bta),
             .y              (pc_pre)
         );
+        
+    mux2 #(32) pc_jmp_register_jump_mux (
+            .sel (register_jump_addr),
+            .a (jta_from_instruction),
+            .b (alu_pa),
+            .y (jta)
+    )
 
     mux2 #(32) pc_jmp_mux (
             .sel            (jump),
@@ -68,14 +78,25 @@ module datapath (
             .b              (jta),
             .y              (pc_next)
         );
+    
 
+
+    wire [4:0] rf_wa_intermediate;
     // --- RF Logic --- //
-    mux2 #(5) rf_wa_mux (
+    mux2 #(5) rf_wa_intermediate_mux (
             .sel            (reg_dst),
             .a              (instr[20:16]),
             .b              (instr[15:11]),
-            .y              (rf_wa)
+            .y              (rf_wa_intermediate)
         );
+
+    mux2 #(5) rf_wa_return_address_mus (
+        .sel                (enable_write_return_addr),
+        .a                  (rf_wa_intermediate),
+        .b                  (5'b11111),
+        .y                  (rf_wa),
+    )
+
 
     regfile rf (
             .clk            (clk),
@@ -112,11 +133,20 @@ module datapath (
             .y              (alu_out)
         );
 
+
+    wire [31:0] wd_rf_intermediate;
     // --- MEM Logic --- //
-    mux2 #(32) rf_wd_mux (
+    mux2 #(32) rf_wd_intermediate_mux (
             .sel            (dm2reg),
             .a              (alu_out),
             .b              (rd_dm),
+            .y              (wd_rf_intermediate)
+        );
+
+    mux2 #(32) rf_wd_pc_return_address_mux (
+            .sel            (enable_write_return_addr),
+            .a              (wd_rf_intermediate),
+            .b              (pc_current),
             .y              (wd_rf)
         );
 

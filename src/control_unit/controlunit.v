@@ -8,7 +8,9 @@ module controlunit (
         output wire        alu_src,
         output wire        we_dm,
         output wire        dm2reg,
-        output wire [3:0]  alu_ctrl
+        output wire [3:0]  alu_ctrl,
+        output wire enable_write_return_addr,
+        output wire register_jump_addr
     );
     
     wire [1:0] alu_op;
@@ -22,7 +24,10 @@ module controlunit (
         .alu_src        (alu_src),
         .we_dm          (we_dm),
         .dm2reg         (dm2reg),
-        .alu_op         (alu_op)
+        .alu_op         (alu_op),
+        
+        .enable_write_return_addr (enable_write_return_addr),
+        .register_jump_addr (register_jump_addr)
     );
 
     auxdec ad (
