@@ -8,7 +8,7 @@ module controlunit (
         output wire        alu_src,
         output wire        we_dm,
         output wire        dm2reg,
-        output wire [2:0]  alu_ctrl
+        output wire [3:0]  alu_ctrl
     );
     
     wire [1:0] alu_op;

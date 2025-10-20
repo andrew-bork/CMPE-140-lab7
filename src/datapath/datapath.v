@@ -7,7 +7,7 @@ module datapath (
         input  wire        we_reg,
         input  wire        alu_src,
         input  wire        dm2reg,
-        input  wire [2:0]  alu_ctrl,
+        input  wire [3:0]  alu_ctrl,
         input  wire [4:0]  ra3,
         input  wire [31:0] instr,
         input  wire [31:0] rd_dm,
@@ -107,6 +107,7 @@ module datapath (
             .op             (alu_ctrl),
             .a              (alu_pa),
             .b              (alu_pb),
+            .shmt           (instr[10:6])
             .zero           (zero),
             .y              (alu_out)
         );
