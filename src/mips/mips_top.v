@@ -36,8 +36,7 @@ module mips_top (
             .we             (we_dm),
             .a              (alu_out[7:2]),
             .d              (wd_dm),
-            .q              (rd_dm),
-            .rst            (rst)
+            .q              (rd_dm)
         );
 
 endmodule
