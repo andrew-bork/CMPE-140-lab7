@@ -10,6 +10,8 @@ module tb_mips_top;
     wire [31:0] rd_dm;
     wire [31:0] DONT_USE;
     
+    integer i;
+    
     mips_top DUT (
             .clk            (clk),
             .rst            (rst),

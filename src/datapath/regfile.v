@@ -8,7 +8,8 @@ module regfile (
         input  wire [31:0] wd,
         output wire [31:0] rd1,
         output wire [31:0] rd2,
-        output wire [31:0] rd3
+        output wire [31:0] rd3,
+        input  wire        rst
     );
 
     reg [31:0] rf [0:31];
@@ -20,25 +21,16 @@ module regfile (
         rf[29] = 32'h100; // Initialze $sp
     end
     
-    always @ (posedge clk) begin
-        if (we) rf[wa] <= wd;
+    always @ (posedge clk, posedge rst) begin
+        if (rst) begin
+            for (n = 0; n < 32; n = n + 1) rf[n] = 32'h0;
+            rf[29] = 32'h100; // Initialze $sp
+        end
+        else if (we) rf[wa] <= wd;
     end
 
     assign rd1 = (ra1 == 0) ? 0 : rf[ra1];
     assign rd2 = (ra2 == 0) ? 0 : rf[ra2];
     assign rd3 = (ra3 == 0) ? 0 : rf[ra3];
-
-    
-    initial begin
-        $dumpfile("regs.vcd");
-        $dumpvars(0, rf[7]);
-        $dumpvars(0, rf[8]);
-        $dumpvars(0, rf[3]);
-        $dumpvars(0, rf[31]);
-        $dumpvars(0, rf[16]);
-        $dumpvars(0, rf[4]);
-        $dumpvars(0, rf[2]);
-        $dumpvars(0, rf[29]);
-    end
 
 endmodule
