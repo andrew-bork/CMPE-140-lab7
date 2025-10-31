@@ -11,17 +11,21 @@ module datapath (
         input  wire [4:0]  ra3,
         input  wire [31:0] instr,
         input  wire [31:0] rd_dm,
+        input  wire        jal,
+        input  wire        jr,
         output wire [31:0] pc_current,
         output wire [31:0] alu_out,
         output wire [31:0] wd_dm,
         output wire [31:0] rd3
+
     );
 
     wire [4:0]  rf_wa;
+    wire [4:0] shmt; // new
     wire        pc_src;
     wire [31:0] pc_plus4;
     wire [31:0] pc_pre;
-    wire [31:0] pc_next;
+    wire [31:0] pc_next; 
     wire [31:0] sext_imm;
     wire [31:0] ba;
     wire [31:0] bta;
@@ -34,7 +38,7 @@ module datapath (
     assign pc_src = branch & zero;
     assign ba = {sext_imm[29:0], 2'b00};
     assign jta = {pc_plus4[31:28], instr[25:0], 2'b00};
-    
+    assign shmt = instr[10:6]; // assign this newly added shmt
     // --- PC Logic --- //
     dreg pc_reg (
             .clk            (clk),
@@ -108,6 +112,8 @@ module datapath (
             .op             (alu_ctrl),
             .a              (alu_pa),
             .b              (alu_pb),
+            .shmt           (shmt), // Add this connection for the reg u added
+            .clk            (clk), // Add clock connection. Not actually required
             .zero           (zero),
             .y              (alu_out)
         );

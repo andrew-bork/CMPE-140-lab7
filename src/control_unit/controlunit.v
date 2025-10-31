@@ -8,7 +8,9 @@ module controlunit (
         output wire        alu_src,
         output wire        we_dm,
         output wire        dm2reg,
-        output wire [3:0]  alu_ctrl
+        output wire [3:0]  alu_ctrl,
+        output wire        jal,
+        output wire        jr
     );
     
     wire [1:0] alu_op;
@@ -22,13 +24,15 @@ module controlunit (
         .alu_src        (alu_src),
         .we_dm          (we_dm),
         .dm2reg         (dm2reg),
-        .alu_op         (alu_op)
+        .alu_op         (alu_op),
+        .jal            (jal)
     );
 
     auxdec ad (
         .alu_op         (alu_op),
         .funct          (funct),
-        .alu_ctrl       (alu_ctrl)
+        .alu_ctrl       (alu_ctrl),
+        .jr             (jr)
     );
 
 endmodule

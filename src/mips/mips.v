@@ -4,11 +4,15 @@ module mips (
         input  wire [4:0]  ra3,
         input  wire [31:0] instr,
         input  wire [31:0] rd_dm,
+        input  wire        jal,
+        input  wire        jr,
+        
         output wire        we_dm,
         output wire [31:0] pc_current,
         output wire [31:0] alu_out,
         output wire [31:0] wd_dm,
         output wire [31:0] rd3
+
     );
     
     wire       branch;
@@ -17,8 +21,10 @@ module mips (
     wire       we_reg;
     wire       alu_src;
     wire       dm2reg;
-    wire [2:0] alu_ctrl;
-
+    wire [3:0] alu_ctrl; // this was 2 and was causing a bug making aluout be xxxx
+    wire       jal;
+    wire       jr;
+    
     datapath dp (
             .clk            (clk),
             .rst            (rst),
@@ -35,7 +41,9 @@ module mips (
             .pc_current     (pc_current),
             .alu_out        (alu_out),
             .wd_dm          (wd_dm),
-            .rd3            (rd3)
+            .rd3            (rd3),
+            .jal            (jal), 
+            .jr             (jr)
         );
 
     controlunit cu (
@@ -48,7 +56,9 @@ module mips (
             .alu_src        (alu_src),
             .we_dm          (we_dm),
             .dm2reg         (dm2reg),
-            .alu_ctrl       (alu_ctrl)
+            .alu_ctrl       (alu_ctrl),
+            .jal            (jal),
+            .jr             (jr)
         );
 
 endmodule

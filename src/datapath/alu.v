@@ -3,7 +3,7 @@ module alu (
         input  wire [31:0] a,
         input  wire [31:0] b,
         input  wire [4:0]  shmt,
-        input  wire clk,
+        input  wire        clk,
         output wire        zero,
         output reg  [31:0] y
     );
@@ -18,7 +18,7 @@ module alu (
         end
     end
 
-    always @ (op, a, b) begin
+    always @ (op, a, b, shmt) begin
         case (op)
             4'b0000: y = a & b;
             4'b0001: y = a | b;
@@ -28,7 +28,9 @@ module alu (
 
             4'b1010: y = multiplier_register[63:32];
             4'b1011: y = multiplier_register[31:0];
-
+            
+            4'b1000: y = b << shmt[4:0];     // SLL
+            4'b1001: y = b >> shmt[4:0];     // SRL
             default: y = 32'hXXXX_XXXX;
         endcase
     end
